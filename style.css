@@ -133,6 +133,19 @@ h2 {
   object-fit: contain;
 }
 
+/* Videos keep their own shape (e.g. 4:3) instead of filling the box */
+.showcase:has(video) {
+  height: auto;
+  justify-self: center;
+}
+
+.showcase video {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(60vh - 4rem);
+}
+
 .showcase-placeholder {
   display: grid;
   place-items: center;
@@ -151,6 +164,10 @@ h2 {
   .showcase {
     height: auto;
     aspect-ratio: 16 / 9;
+  }
+
+  .showcase:has(video) {
+    aspect-ratio: auto;
   }
 }
 
