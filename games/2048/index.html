@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 — John Sedensky</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #faf8ef;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      outline: none;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="600" height="760" tabindex="0" aria-label="2048 game. Use arrow keys or swipe to move tiles."></canvas>
+
+  <script>
+    // JavaScript port of game_2048_sdl.cpp (github.com/ssednski/2048-Game)
+
+    // Constants
+    const WINDOW_WIDTH = 600;
+    const WINDOW_HEIGHT = 760;
+    const GRID_SIZE = 4;
+    const TILE_SIZE = 120;
+    const TILE_MARGIN = 15;
+    const GRID_OFFSET_X = 38; // centers the grid in the 600px width
+    const GRID_OFFSET_Y = 150;
+
+    const LARGE_FONT = 'bold 48px "DejaVu Sans", Verdana, sans-serif';
+    const SMALL_FONT = '24px "DejaVu Sans", Verdana, sans-serif';
+
+    // Colors for different tile values
+    function getTileColor(value) {
+      switch (value) {
+        case 0:    return 'rgb(205, 193, 180)'; // Empty
+        case 2:    return 'rgb(238, 228, 218)';
+        case 4:    return 'rgb(237, 224, 200)';
+        case 8:    return 'rgb(242, 177, 121)';
+        case 16:   return 'rgb(245, 149, 99)';
+        case 32:   return 'rgb(246, 124, 95)';
+        case 64:   return 'rgb(246, 94, 59)';
+        case 128:  return 'rgb(237, 207, 114)';
+        case 256:  return 'rgb(237, 204, 97)';
+        case 512:  return 'rgb(237, 200, 80)';
+        case 1024: return 'rgb(237, 197, 63)';
+        case 2048: return 'rgb(237, 194, 46)';
+        default:   return 'rgb(60, 58, 50)';    // Higher values
+      }
+    }
+
+    function getTextColor(value) {
+      if (value <= 4) return 'rgb(119, 110, 101)'; // Dark text for light tiles
+      return 'rgb(249, 246, 242)';                 // Light text for dark tiles
+    }
+
+    const emptyBoard = () => Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
+    const copyBoard = (b) => b.map(row => row.slice());
+    const sameRow = (a, b) => a.every((x, i) => x === b[i]);
+
+    class Game2048 {
+      constructor() {
+        this.reset();
+      }
+
+      spawnTile() {
+        const empty = [];
+        for (let r = 0; r < GRID_SIZE; r++)
+          for (let c = 0; c < GRID_SIZE; c++)
+            if (this.board[r][c] === 0) empty.push([r, c]);
+
+        if (empty.length === 0) return;
+
+        const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+        this.board[r][c] = Math.random() < 0.1 ? 4 : 2;
+      }
+
+      compressRow(row) {
+        const compressed = row.filter(x => x !== 0);
+        while (compressed.length < row.length) compressed.push(0);
+        return compressed;
+      }
+
+      mergeRow(row) {
+        row = row.slice();
+        for (let i = 0; i < row.length - 1; i++) {
+          if (row[i] !== 0 && row[i] === row[i + 1]) {
+            row[i] *= 2;
+            this.score += row[i];
+            row[i + 1] = 0;
+            i++;
+          }
+        }
+        return this.compressRow(row);
+      }
+
+      saveUndo() {
+        this.prevBoard = copyBoard(this.board);
+        this.prevScore = this.score;
+      }
+
+      moveLeft() {
+        this.saveUndo();
+        let moved = false;
+        this.board = this.board.map(row => {
+          const temp = this.mergeRow(this.compressRow(row));
+          if (!sameRow(temp, row)) moved = true;
+          return temp;
+        });
+        return moved;
+      }
+
+      moveRight() {
+        this.saveUndo();
+        let moved = false;
+        this.board = this.board.map(row => {
+          const temp = this.mergeRow(this.compressRow(row.slice().reverse())).reverse();
+          if (!sameRow(temp, row)) moved = true;
+          return temp;
+        });
+        return moved;
+      }
+
+      moveUp() {
+        this.saveUndo();
+        let moved = false;
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const col = this.board.map(row => row[c]);
+          const temp = this.mergeRow(this.compressRow(col));
+          if (!sameRow(temp, col)) moved = true;
+          for (let r = 0; r < GRID_SIZE; r++) this.board[r][c] = temp[r];
+        }
+        return moved;
+      }
+
+      moveDown() {
+        this.saveUndo();
+        let moved = false;
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const col = this.board.map(row => row[c]);
+          const temp = this.mergeRow(this.compressRow(col.slice().reverse())).reverse();
+          if (!sameRow(temp, col)) moved = true;
+          for (let r = 0; r < GRID_SIZE; r++) this.board[r][c] = temp[r];
+        }
+        return moved;
+      }
+
+      canMove() {
+        // Check for empty cells
+        for (let r = 0; r < GRID_SIZE; r++)
+          for (let c = 0; c < GRID_SIZE; c++)
+            if (this.board[r][c] === 0) return true;
+
+        // Check for possible merges
+        for (let r = 0; r < GRID_SIZE; r++)
+          for (let c = 0; c < GRID_SIZE; c++) {
+            if (c < GRID_SIZE - 1 && this.board[r][c] === this.board[r][c + 1]) return true;
+            if (r < GRID_SIZE - 1 && this.board[r][c] === this.board[r + 1][c]) return true;
+          }
+
+        return false;
+      }
+
+      checkGameOver() { this.gameOver = !this.canMove(); }
+
+      undo() {
+        if (this.prevBoard) {
+          this.board = this.prevBoard;
+          this.score = this.prevScore;
+          this.prevBoard = null;
+          this.gameOver = false;
+        }
+      }
+
+      reset() {
+        this.board = emptyBoard();
+        this.prevBoard = null;
+        this.score = 0;
+        this.gameOver = false;
+        this.spawnTile();
+        this.spawnTile();
+      }
+    }
+
+    // Rendering
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    function drawText(text, x, y, color, font, centered = false) {
+      ctx.font = font;
+      ctx.fillStyle = color;
+      ctx.textAlign = centered ? 'center' : 'left';
+      ctx.textBaseline = centered ? 'middle' : 'top';
+      ctx.fillText(text, x, y);
+    }
+
+    function drawTile(value, x, y) {
+      ctx.fillStyle = getTileColor(value);
+      ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+      if (value > 0) {
+        // Shrink long numbers so 4+ digit tiles still fit
+        const text = String(value);
+        const size = text.length <= 2 ? 48 : text.length === 3 ? 42 : text.length === 4 ? 34 : 28;
+        const font = `bold ${size}px "DejaVu Sans", Verdana, sans-serif`;
+        drawText(text, x + TILE_SIZE / 2, y + TILE_SIZE / 2, getTextColor(value), font, true);
+      }
+    }
+
+    function render(game) {
+      // Clear screen with background color
+      ctx.fillStyle = 'rgb(250, 248, 239)';
+      ctx.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+      const titleColor = 'rgb(119, 110, 101)';
+      drawText('2048', GRID_OFFSET_X - TILE_MARGIN, 30, titleColor, LARGE_FONT);
+      ctx.font = SMALL_FONT;
+      const scoreText = 'Score: ' + game.score;
+      const gridRight = GRID_OFFSET_X - TILE_MARGIN + GRID_SIZE * TILE_SIZE + (GRID_SIZE + 1) * TILE_MARGIN;
+      drawText(scoreText, gridRight - ctx.measureText(scoreText).width, 50, titleColor, SMALL_FONT);
+
+      // Draw grid background
+      const gridX = GRID_OFFSET_X - TILE_MARGIN;
+      const gridY = GRID_OFFSET_Y - TILE_MARGIN;
+      const gridW = GRID_SIZE * TILE_SIZE + (GRID_SIZE + 1) * TILE_MARGIN;
+      ctx.fillStyle = 'rgb(187, 173, 160)';
+      ctx.fillRect(gridX, gridY, gridW, gridW);
+
+      // Draw tiles
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const x = GRID_OFFSET_X + c * (TILE_SIZE + TILE_MARGIN);
+          const y = GRID_OFFSET_Y + r * (TILE_SIZE + TILE_MARGIN);
+          drawTile(game.board[r][c], x, y);
+        }
+      }
+
+      // Draw game over overlay
+      if (game.gameOver) {
+        ctx.fillStyle = 'rgba(238, 228, 218, 0.78)';
+        ctx.fillRect(gridX, gridY, gridW, gridW);
+        drawText('Game Over!', WINDOW_WIDTH / 2, gridY + gridW / 2 - 30, titleColor, LARGE_FONT, true);
+        drawText('Press R to restart', WINDOW_WIDTH / 2, gridY + gridW / 2 + 30, titleColor, SMALL_FONT, true);
+      }
+
+      // Draw controls hint
+      drawText('Arrow keys to move | R to restart | U to undo',
+               WINDOW_WIDTH / 2, WINDOW_HEIGHT - 30, titleColor, SMALL_FONT, true);
+    }
+
+    // Input
+    const game = new Game2048();
+
+    function handleMove(direction) {
+      if (game.gameOver) return;
+      const moved = {
+        left: () => game.moveLeft(),
+        right: () => game.moveRight(),
+        up: () => game.moveUp(),
+        down: () => game.moveDown(),
+      }[direction]();
+
+      if (moved) {
+        game.spawnTile();
+        game.checkGameOver();
+      }
+      render(game);
+    }
+
+    const KEY_DIRECTIONS = {
+      ArrowLeft: 'left', a: 'left',
+      ArrowRight: 'right', d: 'right',
+      ArrowUp: 'up', w: 'up',
+      ArrowDown: 'down', s: 'down',
+    };
+
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (KEY_DIRECTIONS[key]) {
+        e.preventDefault();
+        handleMove(KEY_DIRECTIONS[key]);
+      } else if (key === 'u') {
+        game.undo();
+        render(game);
+      } else if (key === 'r') {
+        game.reset();
+        render(game);
+      }
+    });
+
+    // Swipe support for touch screens
+    let touchStart = null;
+    canvas.addEventListener('touchstart', (e) => {
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (!touchStart) return;
+      const dx = e.changedTouches[0].clientX - touchStart.x;
+      const dy = e.changedTouches[0].clientY - touchStart.y;
+      touchStart = null;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return;
+      if (Math.abs(dx) > Math.abs(dy)) handleMove(dx > 0 ? 'right' : 'left');
+      else handleMove(dy > 0 ? 'down' : 'up');
+    });
+
+    // Clicking the game gives it keyboard focus when embedded
+    canvas.addEventListener('pointerdown', () => canvas.focus());
+
+    render(game);
+  </script>
+</body>
+</html>

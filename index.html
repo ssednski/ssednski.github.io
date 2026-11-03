@@ -10,10 +10,7 @@
 <body>
   <header class="intro">
     <h1>John Sedensky</h1>
-    <p class="tagline">Computer science student. Here are some things I've built.</p>
-    <nav class="links">
-      <a href="https://github.com/ssednski">GitHub</a>
-    </nav>
+    <p class="tagline">I am a computer science student at UConn! Here are some things I've built.</p>
   </header>
 
   <main>
@@ -22,6 +19,22 @@
     <!--
       To add a project, copy one <article class="project"> block and edit it.
       Remove any link you don't have (e.g. no live demo).
+
+      Optional showcase: put a <figure class="showcase"> first in the card and
+      wrap the text in <div class="project-info">. Use one of these inside it:
+
+        Screenshot or GIF:
+          <img src="images/my-project.png" alt="Describe what's shown">
+
+        Video (put the file in the repo, e.g. videos/demo.mp4):
+          <video src="videos/demo.mp4" autoplay muted loop playsinline></video>
+
+        YouTube video (use the /embed/ link from Share > Embed):
+          <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Demo video"
+                  loading="lazy" allowfullscreen></iframe>
+
+        Live web demo (any page that allows embedding):
+          <iframe src="https://example.com/demo" title="Live demo" loading="lazy"></iframe>
     -->
     <div class="projects">
       <article class="project">
@@ -48,15 +61,20 @@
       </article>
 
       <article class="project">
-        <h3>Project Three</h3>
-        <p>A short description of what this project does and why you built it.</p>
-        <ul class="tags">
-          <li>JavaScript</li>
-          <li>HTML/CSS</li>
-        </ul>
-        <div class="project-links">
-          <a href="https://github.com/ssednski">Code</a>
-          <a href="#">Live demo</a>
+        <figure class="showcase">
+          <iframe src="games/2048/index.html" title="Playable 2048 game" loading="lazy"></iframe>
+        </figure>
+        <div class="project-info">
+          <h3>2048 Game</h3>
+          <p>I originally made this in C++, but po with GUI that you can play on my webiste! A small, fun project I made to again practice C++ basics and creating GUI with the help of an agent.</p>
+          <ul class="tags">
+            <li>javascript</li>
+            <li>C++</li>
+          </ul>
+          <div class="project-links">
+            <a href="https://github.com/ssednski/2048-Game">Code</a>
+            <a href="games/2048/index.html">Play full screen</a>
+          </div>
         </div>
       </article>
     </div>
@@ -64,6 +82,9 @@
 
   <footer>
     <p>&copy; 2026 John Sedensky</p>
+    <nav class="links">
+      <a href="https://github.com/ssednski">GitHub</a>
+    </nav>
   </footer>
 </body>
 </html>
