@@ -6,7 +6,7 @@
   --border: #e3e3e3;
   --accent: #2563eb;
   --tag-bg: #eef2ff;
-  --bg-gradient: linear-gradient(0deg, #c7d2fe 0%, #f5f5f5 50%, #e9d5ff 100%);
+  --circuit: 79, 70, 229;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,7 +18,7 @@
     --border: #2c2e33;
     --accent: #6ea8fe;
     --tag-bg: #232a3b;
-    --bg-gradient: linear-gradient(0deg, #181e37 0%, #111214 50%, #3b1f5c 100%);
+    --circuit: 110, 168, 254;
   }
 }
 
@@ -28,17 +28,42 @@
 
 html {
   min-height: 100%;
-  background: var(--bg-gradient) fixed;
-  background-color: var(--bg);
+  background: var(--bg);
 }
 
 body {
   margin: 0 auto;
-  max-width: 960px;
+  max-width: 1200px;
   padding: 0 1.5rem;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   color: var(--text);
+}
+
+/* Circuit-board texture (drawn by circuit.js) */
+.circuit {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.circuit-traces {
+  fill: none;
+  stroke: rgba(var(--circuit), 0.09);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.circuit-pulses {
+  fill: none;
+  stroke: rgba(var(--circuit), 0.6);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(var(--circuit), 0.7));
 }
 
 a {
@@ -51,7 +76,8 @@ a:hover {
 }
 
 .intro {
-  padding: 4rem 0 2.5rem;
+  padding: 4rem 0 1rem;
+  margin-bottom: 0px;
 }
 
 .intro h1 {
@@ -70,42 +96,124 @@ a:hover {
   gap: 1rem;
 }
 
+/* About on the left, projects on the right, each half the page */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.about {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.about h2 {
+  margin-top: 0;
+}
+
+.about-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.profile-photo {
+  flex: 0 0 160px;
+  width: 160px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: 50% 80%;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+
+.about-text p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+.projects-section {
+  min-width: 0;
+}
+
+.projects-section h2 {
+  margin-top: 0;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .about {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-body {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .projects {
+  /* How much of the previous/next project peeks in above and below */
+  --peek: 3.5rem;
+  --scroller-height: min(80vh, 760px); /* cap so it doesn't stretch when zoomed out */
+  --card-pad: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  height: 60vh;
+  gap: 1rem;
+  height: var(--scroller-height);
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding: var(--peek) 0.5rem var(--peek) 0;
+  scroll-padding-block: var(--peek);
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-width: none;
+  /* Fade the peeking projects out toward the top and bottom edges */
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0,
+    #000 var(--peek),
+    #000 calc(100% - var(--peek)),
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+.projects::-webkit-scrollbar {
+  display: none;
 }
 
 .project {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
+  flex: 0 0 auto;
+  min-height: 100%;
+  scroll-snap-align: center;
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 2rem;
+  padding: var(--card-pad);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
 }
 
-/* Cards with a showcase: media on the left, text on the right */
+/* Cards with a showcase: media on top, description below */
 .project:has(.showcase) {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .project-info {
@@ -114,9 +222,12 @@ h2 {
 }
 
 .showcase {
+  /* Leave roughly half the card for the description */
+  --showcase-max: calc((var(--scroller-height) - 2 * var(--peek) - 2 * var(--card-pad)) * 0.55);
   margin: 0;
-  height: 100%;
-  max-height: calc(60vh - 4rem);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: var(--showcase-max);
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -135,15 +246,25 @@ h2 {
 
 /* Videos keep their own shape (e.g. 4:3) instead of filling the box */
 .showcase:has(video) {
-  height: auto;
-  justify-self: center;
+  width: auto;
+  aspect-ratio: auto;
+  align-self: center;
 }
 
 .showcase video {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: calc(60vh - 4rem);
+  max-height: var(--showcase-max);
+}
+
+/* The 2048 game's canvas is 600x760, so size the box to match */
+.game-showcase {
+  width: auto;
+  height: calc(var(--showcase-max) * 1.15); /* short description leaves extra room */
+  max-height: none;
+  aspect-ratio: 600 / 760;
+  align-self: center;
 }
 
 .showcase-placeholder {
@@ -153,22 +274,6 @@ h2 {
   min-height: 200px;
   color: var(--muted);
   font-size: 0.9rem;
-}
-
-@media (max-width: 720px) {
-  .project:has(.showcase) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .showcase {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  .showcase:has(video) {
-    aspect-ratio: auto;
-  }
 }
 
 .project h3 {

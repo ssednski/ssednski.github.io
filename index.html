@@ -6,83 +6,96 @@
   <title>John Sedensky — Projects</title>
   <meta name="description" content="Programming projects by John Sedensky, computer science student.">
   <link rel="stylesheet" href="style.css">
+  <script src="circuit.js" defer></script>
 </head>
 <body>
   <header class="intro">
     <h1>John "Jack" Sedensky</h1>
-    <p class="tagline">I am a computer science student at UConn! Here are some things I've built.</p>
   </header>
 
-  <main>
-    <h2>Projects</h2>
-
-    <!--
-      To add a project, copy one <article class="project"> block and edit it.
-      Remove any link you don't have (e.g. no live demo).
-
-      Optional showcase: put a <figure class="showcase"> first in the card and
-      wrap the text in <div class="project-info">. Use one of these inside it:
-
-        Screenshot or GIF:
-          <img src="images/my-project.png" alt="Describe what's shown">
-
-        Video (put the file in the repo, e.g. videos/demo.mp4):
-          <video src="videos/demo.mp4" autoplay muted loop playsinline></video>
-
-        YouTube video (use the /embed/ link from Share > Embed):
-          <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Demo video"
-                  loading="lazy" allowfullscreen></iframe>
-
-        Live web demo (any page that allows embedding):
-          <iframe src="https://example.com/demo" title="Live demo" loading="lazy"></iframe>
-    -->
-    <div class="projects">
-      <article class="project">
-        <h3>Border Gateway Protocol Simulator</h3>
-        <p>A C++ simulator of BGP routing across real Internet AS-relationship data, with Route Origin Validation to model defenses against prefix hijacks. I built this to demonstrate my understanding of C++ fundamentals and create an infrastructure similar to the networks behind the internet.</p>
-        <ul class="tags">
-          <li>C++</li>
-        </ul>
-        <div class="project-links">
-          <a href="https://github.com/ssednski/BGP_SIM">Code</a>
+  <main class="layout">
+    <aside class="about">
+      <h2>About</h2>
+      <div class="about-body">
+        <img class="profile-photo" src="media/IMG_5949.jpg" alt="Photo of John Sedensky">
+        <div class="about-text">
+          <p>I am a Computer Science student interested in cyber security, software engineering, application development, and solving real-world problems through technology.</p>
+          <p>Having been interested in and learning in technologies and programming for about 5 years now, I am experienced in developing academic and personal projects using Python, Java, JavaScript, and C based languages. I am passionate about learning new technologies, collaborating with others, and building practical software solutions.</p>
         </div>
-      </article>
+      </div>
+    </aside>
 
-      <article class="project">
-        <figure class="showcase">
-          <video src="media/Recording 2026-11-03 141913.mp4" title="VST plugin demo" controls autoplay loop muted preload="metadata" playsinline></video>
-        </figure>
-        <div class="project-info">
-          <h3>Virtual Studio Technology (VST) Plugin</h3>
-          <p>Multi-layered effect C++ plugin for Digital Audio Workstations (DAWs) using the JUCE framework. Includes 5 toggleable effects that users can reorder by dragging the modules. I built this to create an application with an interactive UI design and incorporate my interests in music production with computer science.</p>
-          <ul class="tags">
-            <li>C++</li>
-            <li>JUCE</li>
-          </ul>
-          <div class="project-links">
-            <a href="https://github.com/ssednski/VST_1">Code</a>
-          </div>
-        </div>
-      </article>
+    <section class="projects-section">
+      <h2>Projects</h2>
 
-      <article class="project">
-        <figure class="showcase">
-          <iframe src="games/2048/index.html" title="Playable 2048 game" loading="lazy"></iframe>
-        </figure>
-        <div class="project-info">
-          <h3>2048 Game</h3>
-          <p>I originally made this in C++, but ported to JavaScript to be played here! A small, fun project I made to again practice C++ basics and creating GUI with the help of an agent.</p>
+      <!--
+        To add a project, copy one <article class="project"> block and edit it.
+        Remove any link you don't have (e.g. no live demo).
+
+        Optional showcase: put a <figure class="showcase"> first in the card and
+        wrap the text in <div class="project-info">. Use one of these inside it:
+
+          Screenshot or GIF:
+            <img src="images/my-project.png" alt="Describe what's shown">
+
+          Video (put the file in the repo, e.g. videos/demo.mp4):
+            <video src="videos/demo.mp4" autoplay muted loop playsinline></video>
+
+          YouTube video (use the /embed/ link from Share > Embed):
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Demo video"
+                    loading="lazy" allowfullscreen></iframe>
+
+          Live web demo (any page that allows embedding):
+            <iframe src="https://example.com/demo" title="Live demo" loading="lazy"></iframe>
+      -->
+      <div class="projects">
+        <article class="project">
+          <h3>Border Gateway Protocol Simulator</h3>
+          <p>A C++ simulator of BGP routing across real Internet AS-relationship data, with Route Origin Validation to model defenses against prefix hijacks. I built this to demonstrate my understanding of C++ fundamentals and create an infrastructure similar to the networks behind the internet.</p>
           <ul class="tags">
-            <li>JavaScript</li>
             <li>C++</li>
           </ul>
           <div class="project-links">
-            <a href="https://github.com/ssednski/2048-Game">Code</a>
-            <a href="games/2048/index.html">Play full screen</a>
+            <a href="https://github.com/ssednski/BGP_SIM">Code</a>
           </div>
-        </div>
-      </article>
-    </div>
+        </article>
+
+        <article class="project">
+          <figure class="showcase">
+            <video src="media/Recording 2026-11-03 141913.mp4" title="VST plugin demo" controls autoplay loop muted preload="metadata" playsinline></video>
+          </figure>
+          <div class="project-info">
+            <h3>Virtual Studio Technology (VST) Plugin</h3>
+            <p>Multi-layered effect C++ plugin for Digital Audio Workstations (DAWs) using the JUCE framework. Includes 5 toggleable effects that users can reorder by dragging the modules. I built this to create an application with an interactive UI design and incorporate my interests in music production with computer science.</p>
+            <ul class="tags">
+              <li>C++</li>
+              <li>JUCE</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/ssednski/VST_1">Code</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project">
+          <figure class="showcase game-showcase">
+            <iframe src="games/2048/index.html" title="Playable 2048 game" loading="lazy"></iframe>
+          </figure>
+          <div class="project-info">
+            <h3>2048 Game</h3>
+            <p>I originally made this in C++, but ported to JavaScript to be played here! A small, fun project I made to again practice C++ basics and creating GUI with the help of an agent.</p>
+            <ul class="tags">
+              <li>JavaScript</li>
+              <li>C++</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/ssednski/2048-Game">Code</a>
+              <a href="games/2048/index.html">Play full screen</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   </main>
 
   <footer>
