@@ -7,14 +7,23 @@
   <meta name="description" content="Programming projects by John Sedensky, computer science student.">
   <link rel="stylesheet" href="style.css">
   <script src="circuit.js" defer></script>
+  <script src="nav.js" defer></script>
+  <script src="contact.js" defer></script>
 </head>
 <body>
-  <header class="intro">
+  <nav class="topnav" aria-label="Main">
+    <a href="#home" aria-current="true">Home</a>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <header class="intro" id="home">
     <h1>John "Jack" Sedensky</h1>
   </header>
 
   <main class="layout">
-    <aside class="about">
+    <aside class="about" id="about">
       <h2>About</h2>
       <div class="about-body">
         <div class="about-text">
@@ -24,7 +33,7 @@
       </div>
     </aside>
 
-    <section class="projects-section">
+    <section class="projects-section" id="projects">
       <h2>Projects</h2>
 
       <!--
@@ -94,6 +103,39 @@
           </div>
         </article>
       </div>
+    </section>
+
+    <section class="contact" id="contact">
+      <h2>Contact</h2>
+      <p class="contact-intro">Have a question or an opportunity? Send me a message, or email me directly at <a href="mailto:jacksedensky@gmail.com">jacksedensky@gmail.com</a>.</p>
+      <!-- Sent by FormSubmit (formsubmit.co). The very first message triggers a
+           one-time activation email to the address below; click it to start delivery. -->
+      <form class="contact-form" action="https://formsubmit.co/jacksedensky@gmail.com" method="POST">
+        <label>
+          Name
+          <input type="text" name="name" autocomplete="name" required>
+        </label>
+        <label>
+          Your email
+          <input type="email" name="email" autocomplete="email" required>
+        </label>
+        <label class="full">
+          Subject
+          <input type="text" name="_subject" required>
+        </label>
+        <label class="full">
+          Message
+          <textarea name="message" rows="6" required></textarea>
+        </label>
+        <!-- Spam trap: hidden from people, bots tend to fill it in -->
+        <input type="text" name="_honey" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <div class="contact-actions">
+          <button type="submit">Send message</button>
+          <span class="contact-status" role="status" aria-live="polite"></span>
+        </div>
+      </form>
     </section>
   </main>
 

@@ -7,6 +7,8 @@
   --accent: #2563eb;
   --tag-bg: #eef2ff;
   --circuit: 79, 70, 229;
+  --nav-bg: rgba(250, 250, 250, 0.8);
+  --nav-height: 3.25rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +21,7 @@
     --accent: #6ea8fe;
     --tag-bg: #232a3b;
     --circuit: 110, 168, 254;
+    --nav-bg: rgba(17, 18, 20, 0.8);
   }
 }
 
@@ -29,6 +32,77 @@
 html {
   min-height: 100%;
   background: var(--bg);
+  overflow-x: clip; /* the nav's full-width background can't cause sideways scroll */
+  scroll-padding-top: calc(var(--nav-height) + 1rem); /* section jumps land below the nav */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Top navigation: sticks to the top, translucent so the circuit shows through */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  align-items: center;
+  min-height: var(--nav-height);
+}
+
+/* Full-width background behind the bar, even though the body is capped at 1200px */
+.topnav::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.topnav a {
+  position: relative;
+  padding: 0.25rem 0;
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Accent underline that grows in on hover and stays on the current section */
+.topnav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.topnav a:hover,
+.topnav a[aria-current] {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.topnav a:hover::after,
+.topnav a[aria-current]::after {
+  transform: scaleX(1);
+}
+
+.topnav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 body {
@@ -96,17 +170,11 @@ a:hover {
   gap: 1rem;
 }
 
-/* About on the left, projects on the right, each half the page */
+/* Sections stacked top to bottom, in the same order as the nav */
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  align-items: start;
-}
-
-.about {
-  position: sticky;
-  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
 }
 
 .about h2 {
@@ -129,6 +197,10 @@ a:hover {
   border-radius: 50%;
 }
 
+.about-text {
+  max-width: 75ch; /* keep lines readable now that About is full width */
+}
+
 .about-text p {
   margin: 0 0 1rem;
   color: var(--muted);
@@ -144,16 +216,6 @@ a:hover {
 
 .projects-section h2 {
   margin-top: 0;
-}
-
-@media (max-width: 800px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .about {
-    position: static;
-  }
 }
 
 @media (max-width: 480px) {
@@ -306,6 +368,137 @@ h2 {
   gap: 1rem;
   margin-top: 0.5rem;
   font-weight: 500;
+}
+
+/* Contact form */
+.contact h2 {
+  margin-top: 0;
+}
+
+.contact-intro {
+  max-width: 75ch;
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+.contact-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 720px;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.contact-form .full,
+.contact-actions {
+  grid-column: 1 / -1;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.contact-form button {
+  padding: 0.6rem 1.25rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .contact-form button {
+    color: #111214; /* dark text reads better on the light-blue accent */
+  }
+}
+
+.contact-form button:hover {
+  filter: brightness(1.1);
+}
+
+.contact-form button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.contact-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.contact-status {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.contact-status.success {
+  color: #16a34a;
+}
+
+.contact-status.error {
+  color: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  .contact-status.success {
+    color: #4ade80;
+  }
+
+  .contact-status.error {
+    color: #f87171;
+  }
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+}
+
+@media (max-width: 560px) {
+  .contact-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 footer {
