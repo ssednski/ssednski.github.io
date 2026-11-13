@@ -58,6 +58,34 @@
       -->
       <div class="projects">
         <article class="project">
+          <figure class="showcase screenshot-showcase">
+            <!-- Shows the screenshot that matches the visitor's light/dark theme; click for full size -->
+            <a class="theme-light" href="media/streampulse-light.png">
+              <img src="media/streampulse-light.png" alt="StreamPulse dashboard showing session, error rate, start time and ad fill KPIs with trend charts" width="1280" height="1130" loading="lazy">
+            </a>
+            <a class="theme-dark" href="media/streampulse-dark.png">
+              <img src="media/streampulse-dark.png" alt="StreamPulse dashboard showing session, error rate, start time and ad fill KPIs with trend charts" width="1280" height="1130" loading="lazy">
+            </a>
+          </figure>
+          <div class="project-info">
+            <h3>StreamPulse</h3>
+            <p>Playback quality and ad-delivery analytics for a video streaming service. A FastAPI backend ingests player telemetry into PostgreSQL and serves KPIs like error rate, start time, rebuffering and ad fill over REST and GraphQL to a React dashboard, with Prometheus alerts, Grafana dashboards, CI, and Terraform for deploying to AWS. I built this to learn how streaming services measure playback quality and ad delivery, and to practice building a full-stack service the way it runs in production: tested, monitored, containerized and deployable to the cloud.</p>
+            <ul class="tags">
+              <li>Python</li>
+              <li>FastAPI</li>
+              <li>React</li>
+              <li>TypeScript</li>
+              <li>PostgreSQL</li>
+              <li>Docker</li>
+              <li>AWS</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/ssednski/StreamPulse">Code</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project">
           <h3>Border Gateway Protocol Simulator</h3>
           <p>A C++ simulator of BGP routing across real Internet AS-relationship data, with Route Origin Validation to model defenses against prefix hijacks. I built this to demonstrate my understanding of C++ fundamentals and create an infrastructure similar to the networks behind the internet.</p>
           <ul class="tags">

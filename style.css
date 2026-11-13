@@ -232,9 +232,12 @@ h2 {
 
 .projects {
   /* How much of the previous/next project peeks in above and below */
-  --peek: 3.5rem;
-  --scroller-height: min(80vh, 760px); /* cap so it doesn't stretch when zoomed out */
-  --card-pad: 1.25rem;
+  --peek: 2rem;
+  --scroller-height: min(80vh, 720px); /* cap so it doesn't stretch when zoomed out */
+  --card-pad: 1.5rem;
+  /* Tallest a showcase can be: the full inside height of a card */
+  --media-h: calc(var(--scroller-height) - 2 * var(--peek) - 2 * var(--card-pad) - 2px);
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -273,9 +276,12 @@ h2 {
   border-radius: 10px;
 }
 
-/* Cards with a showcase: media on top, description below */
+/* Cards with a showcase: media on the left at full card height, description on the right */
 .project:has(.showcase) {
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2rem;
 }
 
 .project-info {
@@ -283,13 +289,28 @@ h2 {
   flex-direction: column;
 }
 
+/* Text-only cards: only as tall as their text, so there's no empty box around it */
+.project:not(:has(.showcase)) {
+  min-height: 0;
+  padding: calc(var(--card-pad) * 1.5) calc(var(--card-pad) * 2);
+}
+
+.project:not(:has(.showcase)) h3 {
+  font-size: 1.6rem;
+}
+
+.project:not(:has(.showcase)) p {
+  max-width: 70ch;
+  font-size: 1.1rem;
+}
+
+/* Each showcase sets --ratio to its media's shape; the box is sized to match it
+   exactly, so there are no empty bars around the media. */
 .showcase {
-  /* Leave roughly half the card for the description */
-  --showcase-max: calc((var(--scroller-height) - 2 * var(--peek) - 2 * var(--card-pad)) * 0.55);
+  --ratio: 16 / 9;
   margin: 0;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: var(--showcase-max);
+  width: min(calc(var(--media-h) * var(--ratio)), 62cqw);
+  aspect-ratio: var(--ratio);
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -306,36 +327,57 @@ h2 {
   object-fit: contain;
 }
 
-/* Videos keep their own shape (e.g. 4:3) instead of filling the box */
+/* VST demo recording is 1844x1576 */
 .showcase:has(video) {
-  width: auto;
-  aspect-ratio: auto;
-  align-self: center;
+  --ratio: 1844 / 1576;
 }
 
-.showcase video {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: var(--showcase-max);
+/* Dashboard screenshots are 1280x1130 */
+.screenshot-showcase {
+  --ratio: 1280 / 1130;
 }
 
-/* The 2048 game's canvas is 600x760, so size the box to match */
-.game-showcase {
-  width: auto;
-  height: calc(var(--showcase-max) * 1.15); /* short description leaves extra room */
-  max-height: none;
-  aspect-ratio: 600 / 760;
-  align-self: center;
-}
-
-.showcase-placeholder {
-  display: grid;
-  place-items: center;
+.screenshot-showcase a {
+  display: block;
   height: 100%;
-  min-height: 200px;
-  color: var(--muted);
-  font-size: 0.9rem;
+}
+
+/* Show only the screenshot that matches the visitor's theme */
+.theme-dark {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-light {
+    display: none !important;
+  }
+
+  .theme-dark {
+    display: block !important;
+  }
+}
+
+/* The 2048 game's canvas is 600x760 */
+.game-showcase {
+  --ratio: 600 / 760;
+}
+
+/* Narrow screens: media on top, description below */
+@container (max-width: 760px) {
+  .project:has(.showcase) {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .showcase {
+    --media-h: calc((var(--scroller-height) - 2 * var(--peek) - 2 * var(--card-pad)) * 0.55);
+    width: min(calc(var(--media-h) * var(--ratio)), 100%);
+    align-self: center;
+  }
+
+  .project:not(:has(.showcase)) {
+    padding-inline: var(--card-pad);
+  }
 }
 
 .project h3 {
